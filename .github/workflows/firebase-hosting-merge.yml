@@ -11,13 +11,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      # Flutter開発環境のセットアップを追加
-      - uses: subosito/flutter-action@v1
-        with:
-          channel: 'stable' # or: 'beta', 'dev' or 'master'
-      - run: flutter pub get
-      - run: flutter test --platform chrome
-      # ここまでを追加
+      # -- ここから追記部分！ -- #
+      # Flutter のインストール clone がはやい
+      - name: Install Flutter
+        run: git clone https://github.com/flutter/flutter.git
+
+      # PATH を通す
+      - name: Add path
+        run: echo "$(pwd)/flutter/bin" >> $GITHUB_PATH
+
+      # パッケージのダウンロード
+      - name: Download Flutter packages
+        run: flutter pub get
+
+      # -- ここまで追記部分！ -- #
+      # 解説:
+      #   ようは flutter build web をたたいても flutterがインストールされていないので動かないということ
+      #   インストールしてPATH通してパッケージダウンロードしているだけ。
+      # ビルド
       - run: flutter build web
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
